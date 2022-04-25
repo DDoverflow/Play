@@ -1,73 +1,60 @@
 #include <iostream>
 using namespace std;
 
-class Person {
-public:
-    virtual void Input(string, string, int, int) = 0;
-    virtual void Input(string, string, string, string) = 0;
-    virtual void Exhibition() = 0;
-protected:
-    string code;
-    string name;
+
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode() : val(0), next(nullptr) {}
+    ListNode(int x) : val(x), next(nullptr) {}
+    ListNode(int x, ListNode *next) : val(x), next(next) {}
 };
 
-
-class Student: public Person {
+class Solution {
 public:
-    void Input(string, string, int, int);
-    void Input(string, string, string, string) {}
-    void Exhibition();
-private:
-    int s_class;
-    int age;
+    ListNode *addTwoNumbers(ListNode *l1, ListNode *l2) {
+        ListNode *head = nullptr;
+        string res1 = "", res2 = "", result = "";
+        while (l1 != nullptr) {
+            res1 += to_string(l1->val);
+            l1 = l1->next;
+        }
+        while (l2 != nullptr) {
+            res2 += to_string(l2->val);
+            l2 = l2->next;
+        }
+        reverse(res1.begin(), res1.end());
+        reverse(res2.begin(), res2.end());
+        result += to_string(stoi(res1) + stoi(res2));
+        reverse(result.begin(), result.end());
+        for (int num = 0; num < result.length(); num++) {
+            ListNode *middle = new ListNode(int(result[num]) - 48);
+            if (head == nullptr) {
+                head = middle;
+                continue;
+            }
+            ListNode *current = head;
+            while (current->next) current = current->next;
+            current->next = middle;
+        }
+        while (head) {
+            cout << head->val;
+            head = head->next;
+        }
+        return head;
+    }
 };
-
-void Student::Input(string code, string name, int sc, int sa) {
-    this->code = code;
-    this->name = name;
-    this->s_class = sc;
-    this->age = sa;
-}
-
-void Student::Exhibition() {
-    cout << "code: " << this->code << endl;
-    cout << "name: " << this->name << endl;
-    cout << "s_class: " << this->s_class << endl;
-    cout << "age: " << this->age << endl;
-}
-
-
-class  Teacher: public Person {
-public:
-    void Input(string, string, string, string);
-    void Input(string, string, int, int) {}
-    void Exhibition();
-private:
-    string career;
-    string department;
-};
-
-void Teacher::Input(string code, string name, string car, string dep) {
-    this->code = code;
-    this->name = name;
-    this->career = car;
-    this->department = dep;
-}
-
-void Teacher::Exhibition() {
-    cout << "code: " << this->code << endl;
-    cout << "name: " << this->name << endl;
-    cout << "career: " << this->career << endl;
-    cout << "department: " << this->department << endl;
-}
 
 int main() {
-    Teacher matter;
-    matter.Input("101", "Jack", "Professor", "Computer");
-    matter.Exhibition();
-
-    Student substance;
-    substance.Input("2001", "Tom", 3, 12);
-    substance.Exhibition();
+    ListNode *l1 = new ListNode(2);
+    ListNode *l11 = new ListNode(4);
+    ListNode *l12 = new ListNode(3);
+    ListNode *l2 = new ListNode(5);
+    ListNode *l21 = new ListNode(6);
+    ListNode *l22 = new ListNode(4);
+    Solution matter;
+    l1->next = l11, l11->next = l12;
+    l2->next = l21, l21->next = l22;
+    matter.addTwoNumbers(l1, l2);
     return 0;
 }
