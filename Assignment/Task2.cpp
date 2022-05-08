@@ -1,142 +1,55 @@
 #include <iostream>
-#include <vector>
-#define LH 2
-#define RH -2
 using namespace std;
+#include <cmath>
 
-struct Node {
-    int data;
-    struct Node *left = nullptr;
-    struct Node *right = nullptr;
-    Node(int data): data(data) {}
+class Point {
+public:
+    Point() {}
+    Point(double x, double y): x(x), y(y) {}
+    Point(Point &matter) {this->x = matter.x;  this->y = matter.y;}
+    double x, y;
 };
 
-struct Tree {
-    struct Node *root = nullptr;
+class Line {
+public:
+    Line() {}
+    Line(double x1, double y1, double x2, double y2): po1(x1, y1), po2(x2, y2) {}
+    Line(Line &matter) {this->po1 = matter.po1;  this->po2 = matter.po2;}
+    Point po1;
+    Point po2;
+    double Length() {return sqrt(pow(po1.x - po2.x, 2) + pow(po1.y - po2.y, 2));}
 };
 
-// AVL
+class Triangle {
+public:
+    Triangle(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, double x5, double y5,
+        double x6, double y6): line1(x1, y1, x2, y2), line2(x3, y3, x4, y4), line3(x5, y5, x6, y6) {}
+    Line line1;
+    Line line2;
+    Line line3;
+    bool Structure_triangle();
+    double Proportion();
+};
 
-int Acquire_BF(struct Node *&matter, int count = 1) {
-    if (matter == nullptr) return 0;
-    if (matter->left == nullptr && matter->right == nullptr) return 1;
-    int left_depth = Acquire_BF(matter->left, count + 1);
-    int right_depth = Acquire_BF(matter->right, count + 1);
-    if (count == 1) return left_depth - right_depth;
-    if (left_depth && right_depth) return max(left_depth, right_depth) + 1;
-    else if (left_depth) return left_depth + 1;
-    else return right_depth + 1;
+bool Triangle::Structure_triangle() {
+    double len1 = line1.Length(), len2 = line2.Length(), len3 = line3.Length();
+    if (len1 + len2 < len3 || len1 + len3 < len2 || len2 + len3 < len1) return false;
+    return true;
 }
 
-void Right_rotate(struct Node *&matter) {
-    struct Node *middle = matter->left;
-    matter->left = middle->right;
-    middle->right = matter;
-    matter = middle;
-}
-
-void Left_rotate(struct Node *&matter) {
-    struct Node *middle = matter->right;
-    matter->right = middle->left;
-    middle->left = matter;
-    matter = middle;
-}
-
-void Left_Balance(struct Node *&matter) {
-    struct Node *middle = matter->left;
-    switch (Acquire_BF(middle)) {
-        case LH - 1: {Right_rotate(matter);  break;}
-        case RH + 1: {Left_rotate(matter->left);  Right_rotate(matter);  break;}
+double Triangle::Proportion() {
+    if (Structure_triangle()) {
+        double Perimeter = (line1.Length() + line2.Length() + line3.Length()) / 2;
+        double first = Perimeter - line1.Length(), second = Perimeter - line2.Length(), third =
+                Perimeter - line3.Length();
+        return sqrt(Perimeter * first * second * third);
     }
-}
-
-void Right_Balance(struct Node *&matter) {
-    struct Node *middle = matter->right;
-    switch (Acquire_BF(middle)) {
-        case LH - 1: {Right_rotate(matter->right);  Left_rotate(matter);  break;}
-        case RH + 1: {Left_rotate(matter);  break;}
-    }
-}
-
-void Create_AVL(struct Node *&matter, int data) {
-    struct Node *content = new Node(data);
-    if (matter == nullptr) {matter = content;  return;}
-    if (data >= matter->data)
-        Create_AVL(matter->right, data);
-    else if (data < matter->data)
-        Create_AVL(matter->left, data);
-    if (Acquire_BF(matter) == LH) Left_Balance(matter);
-    else if (Acquire_BF(matter) == RH) Right_Balance(matter);
-}
-
-// Search
-
-int Find_vertex(struct Node *matter, int result, int count = 1) {
-    if (matter == nullptr) return 0;
-    if (matter->data == result) return count;
-    if (result > matter->data) return Find_vertex(matter->right, result, count + 1);
-    else if (result < matter->data) return Find_vertex(matter->left, result, count + 1);
-}
-
-// Delete
-
-Node *&Search_vertex(struct Node *&matter, int result) {
-    if (result == matter->data) return matter;
-    if (result > matter->data) return Search_vertex(matter->right, result);
-    return Search_vertex(matter->left, result);
-}
-
-void Delete_vertex(struct Node *&matter, int result) {
-    struct Node *&contents = Search_vertex(matter, result);
-    struct Node *front, *rear;
-    if (contents->left == nullptr) {
-        front = contents;
-        contents = contents->right;
-        delete front;
-    }
-    else if (contents->right == nullptr) {
-        front = contents;
-        contents = contents->left;
-        delete front;
-    }
-    else {
-        front = contents;
-        rear = front->left;
-        while (rear->right != nullptr) {
-            front = rear;
-            rear = rear->right;
-        }
-        contents->data = rear->data;
-        if (front != contents)
-            front->right = rear->left;
-        else
-            front->left = rear->left;
-        delete rear;
-    }
-}
-
-void preorder(struct Node *matter) {
-    if (matter != nullptr) {
-        cout << matter->data << "  ";
-        preorder(matter->left);
-        preorder(matter->right);
-    }
-}
-
-void inorder(struct Node *matter) {
-    if (matter != nullptr) {
-        inorder(matter->left);
-        cout << matter->data << "  ";
-        inorder(matter->right);
-    }
+    return -1;
 }
 
 int main() {
-    struct Tree matter;
-    vector<int> contents = {1,2,3,4,5,6,7,9,10};
-    for (int num = 0; num < contents.size(); num++)
-        Create_AVL(matter.root, contents[num]);
-    preorder(matter.root);  cout << endl;
-    inorder(matter.root);   cout << endl;
+    Triangle matter(1,3,4,7,4,6,8,4,2,1,3,2);
+    cout << "Str_triangle: " << matter.Structure_triangle() << endl;
+    cout << "proportion: " << matter.Proportion() << endl;
     return 0;
 }

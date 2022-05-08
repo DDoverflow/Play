@@ -44,7 +44,7 @@ void Left_Balance(struct Node *&matter) {
     struct Node *middle = matter->left;
     switch (Acquire_depth(middle)) {
         case LH - 1: {Right_rotate(matter);  break;}
-        case RH + 1: {Left_rotate(middle);  Right_rotate(matter);  break;}
+        case RH + 1: {Left_rotate(matter->left);  Right_rotate(matter);  break;}
     }
 }
 
@@ -52,7 +52,7 @@ void Right_Balance(struct Node *&matter) {
     struct Node *middle = matter->right;
     switch (Acquire_depth(middle)) {
         case RH + 1: {Left_rotate(matter);  break;}
-        case LH - 1: {Right_rotate(middle);  Left_rotate(matter);  break;}
+        case LH - 1: {Right_rotate(matter->right);  Left_rotate(matter);  break;}
     }
 }
 
@@ -83,7 +83,7 @@ void inorder(struct Node *matter) {
 
 void test() {
     struct Tree tree;
-    int arr[] = {24,13,53,6,14}, length = sizeof(arr) / sizeof(arr[0]);
+    int arr[] = {1,2,3,4,5,6,7,8,9,10}, length = sizeof(arr) / sizeof(arr[0]);
     for (int num = 0; num < length; num++)
         Create_AVL(tree.root, arr[num]);
     preorder(tree.root);  cout << endl;

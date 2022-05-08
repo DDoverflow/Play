@@ -1,59 +1,25 @@
 #include <iostream>
 #include <vector>
-#define bag_weight 4
 using namespace std;
 
-int Max_Price(vector<int> &contents, vector<int> &prices) {
-    vector<vector<int>> matter(contents.size(), vector<int>(bag_weight + 1, 0));
-    for (int num = contents[0]; num < bag_weight + 1; num++) matter[0][num] = prices[0];
-    for (int content = 1; content < contents.size(); content++) {
-        for (int current = 1; current < bag_weight + 1; current++) {
-            if (current < contents[content]) matter[content][current] = matter[content - 1][current];
-            else matter[content][current] = max(matter[content - 1][current], matter[content - 1][current - contents[content]] + prices[content]);
-        }
+int BuyStock(vector<int> &prices) {
+    vector<vector<int>> dp(2, vector<int>(prices.size(), 0));
+    dp[0][0] -= prices[0];  dp[1][0] = 0;
+    for (int num = 1; num < prices.size(); num++) {
+        dp[0][num] = max(dp[0][num - 1], -prices[num]);
+        dp[1][num] = max(dp[1][num - 1], prices[num] + dp[0][num]);
     }
-    return matter[contents.size() - 1][bag_weight];
-}
-
-int Max_Price(vector<int> &contents, vector<int> &prices, int) {
-    vector<vector<int>> matter(contents.size(), vector<int>(bag_weight + 1, 0));
-    for (int num = contents[0]; num < bag_weight + 1; num++) matter[0][num] = prices[0];
-    for (int content = 1; content < contents.size(); content++) {
-        for (int current = 1; current < bag_weight + 1; current++) {
-            if (current - contents[content] >= 0)
-                matter[content][current] = max(matter[content - 1][current], matter[content - 1][current - contents[content]] + prices[content]);
-        }
-    }
-    return matter[contents.size() - 1][bag_weight];
-}
-
-int Optimize(vector<int> &weight, vector<int> &prices) {
-    vector<int> matter(bag_weight + 1, 0);
-    for (int cur_weight = 0; cur_weight < weight.size(); cur_weight++) {
-        for (int locate = bag_weight; locate >= weight[cur_weight]; locate--)
-            matter[locate] = max(matter[locate], matter[locate - weight[cur_weight]] + prices[cur_weight]);
-    }
-    for (int num1 = 0; num1 < bag_weight + 1; num1++)
-        cout << matter[num1] << "  ";
+    for (int num = 0; num < prices.size(); num++)
+        cout << dp[0][num] << "  ";
     cout << endl;
-//    return matter[bag_weight];
-}
-
-int Optimize(vector<int> &weight, vector<int> &prices, int) {
-    vector<int> matter(bag_weight + 1, 0);
-    for (int locate = bag_weight; locate >= 0; locate--) {
-        for (int cur_weight = 0; cur_weight < weight.size(); cur_weight++) {
-            if (locate - weight[cur_weight] < 0) continue;
-            else matter[locate] = max(matter[locate], matter[locate - weight[cur_weight]] + prices[cur_weight]);
-        }
-    }
-    for (int num1 = 0; num1 < bag_weight + 1; num1++)
-        cout << matter[num1] << "  ";
+    for (int num = 0; num < prices.size(); num++)
+        cout << dp[1][num] << "  ";
     cout << endl;
+    return dp[1][prices.size() - 1];
 }
 
 int main() {
-    vector<int> contents = {1,3,4};
-    vector<int> prices = {15,20,30};
+    vector<int> prices = {7,6,4,3,1};
+    BuyStock(prices);
     return 0;
 }
