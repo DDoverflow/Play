@@ -1,41 +1,36 @@
-//
-// Created by 陈智彬 on 2022/4/15.
-//
-
-//5.编写动态规划法求解数塔问题程序。并调用此程序求解如下数塔。
-//{{18}，{12,15}，{3,8,6}，{8,10,5,12}，{16,4,18,10,9}}
-
 #include <iostream>
-#define len 5
 using namespace std;
+#include <cmath>
+#include <vector>
+#include <unordered_map>
 
-int Data(int arr[len][len]) {
-    int data[len][len] = {0}, path[len][len] = {0};
-    for (int rear = 0; rear < len; rear++)
-        data[len - 1][rear] = arr[len - 1][rear];
-    for (int front = len - 2; front >= 0; front--) {
-        for (int k = 0; k <= front; k++) {
-            if (data[front + 1][k] > arr[front + 1][k + 1]) {
-                data[front][k] = arr[front][k] + data[front + 1][k];
-                path[front][k] = k;
-            }
-            else {
-                data[front][k] = arr[front][k] + data[front + 1][k + 1];
-                path[front][k] = k + 1;
+class Solution {
+public:
+    unordered_map<int, int> map;
+    vector<int> result;
+    int Max = 0;
+
+    vector<int> findRightInterval(vector<vector<int>>& intervals) {
+        if (intervals.size() == 1) return vector<int>{-1};
+        for (int num = 0; num < intervals.size(); num++) {
+            map[intervals[num][0]] = num;
+            Max = max(Max, intervals[num][0]);
+        }
+        for (int num = 0; num < intervals.size(); num++) {
+            int middle = intervals[num][1];
+            while (middle) {
+                if (map[middle] != 0) result.push_back(map[middle]);
+                else if (middle < Max) middle++;
+                else {result.push_back(-1);  break;}
             }
         }
+        return result;
     }
-    cout << arr[0][0];
-    int l = path[0][0];
-    for (int i = 1; i < len; i++) {
-        cout << "->" << arr[i][l];
-        l = path[i][l];
-    }
-    return data[0][0];
-}
+};
 
 int main() {
-    int arr[len][len] = {{18},{12,15},{3,8,6},{8,10,5,12},{16,4,18,10,9}};
-    Data(arr);
+    Solution matter;
+    vector<vector<int>> intervals = {{3,4}, {2,3}, {1,2}};
+    matter.findRightInterval(intervals);
     return 0;
 }
