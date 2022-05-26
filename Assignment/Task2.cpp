@@ -1,64 +1,67 @@
 #include <iostream>
+#define PI 3.14
+#include <cmath>
+#define len 5
 using namespace std;
 
-class Point {
+// 作业第五题
+
+class Shape {
 public:
-    Point(float x = 0, float y = 0);
-    void SetPoint(float matter1, float matter2);
-    float GetX() const {return x;}
-    float GetY() const {return y;}
-    virtual float area() const = 0;
-protected:
-    float x, y;
+    virtual double PrintArea() = 0;
 };
 
-Point::Point(float x, float y) {this->x = x; this->y = y;}
-
-void Point::SetPoint(float matter1, float matter2) {this->x = matter1;  this->y = matter2;}
-
-
-class Circle: public Point {
+class Circle: public Shape {
 public:
-    Circle(float x = 0, float y = 0, float r = 0);
-    void SetRadius(float matter);
-    float GetRadius() const;
-    virtual float area() const;
-private:
-    float radius;
+    Circle(int data): r(data) {}
+    int r;
+    double PrintArea() {return PI * r * r;}
 };
 
-Circle::Circle(float x, float y, float r): Point(x, y), radius(r) {}
-
-void Circle::SetRadius(float matter) {radius = matter;}
-
-float Circle::GetRadius() const {return radius;}
-
-float Circle::area() const {return 3.14159 * radius * radius;}
-
-
-class Cylinder: public Circle {
+class Rectangle: public Shape {
 public:
-    Cylinder(float x = 0, float y = 0, float r = 0, float h = 0);
-    void SetHeight(float matter);
-    float GetHeight() const;
-    virtual float area() const;
-protected:
-    float height;
+    int x, y;
+    Rectangle(int x, int y): x(x), y(y) {}
+    double PrintArea() {return x * y;}
 };
 
-Cylinder::Cylinder(float x, float y, float r, float h): Circle(x, y, r), height(h) {}
+class Triangle: public Shape {
+public:
+    int a, b, c;
+    Triangle(int a, int b, int c): a(a), b(b), c(c) {}
+    double PrintArea() {
+        double C = (a + b + c) / 2;
+        return sqrt(C * (C - a) * (C - b) * (C - c));
+    }
+};
 
-void Cylinder::SetHeight(float matter) {height = matter;}
+class Square: public Shape {
+public:
+    int data;
+    Square(int data): data(data) {}
+    double PrintArea() {return pow(data, 2);}
+};
 
-float Cylinder::GetHeight() const {return height;}
-
-float Cylinder::area() const {return 2 * Circle::area() + 2 * 3.14159 * Circle::GetRadius() * height;}
-
+class Trapezoid: public Shape {
+public:
+    int up, down, height;
+    Trapezoid(int up, int down, int height): up(up), down(down), height(height) {}
+    double PrintArea() {return (up + down) * height / 2;}
+};
 
 int main() {
-    Point *matter = new Circle(3.5, 6.4, 5.2);
-    cout << "Circle area: " << matter->area() << endl;
-    matter = new Cylinder(3.5, 6.4, 5.2, 10);
-    cout << "Cylinder area: " << matter->area() << endl;
-    return 0;
+    Shape **matter = new Shape*[len];
+    matter[0] = new Circle(2);
+    matter[1] = new Rectangle(2, 3);
+    matter[2] = new Triangle(3,4,5);
+    matter[3] = new Square(5);
+    matter[4] = new Trapezoid(2,3,4);
+    cout << "Circle: " << matter[0]->PrintArea() << endl;
+    cout << "Rectangle: " << matter[1]->PrintArea() << endl;
+    cout << "Triangle: " << matter[2]->PrintArea() << endl;
+    cout << "Square: " << matter[3]->PrintArea() << endl;
+    cout << "Trapezoid: " << matter[4]->PrintArea() << endl;
+    double sum = 0;
+    for (int num = 0; num < len; num++) sum += matter[num]->PrintArea();
+    cout << "Sum: " << sum << endl;
 }
